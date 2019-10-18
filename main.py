@@ -15,8 +15,10 @@ def unpack(data: bytes, tree: Tree) -> str:
 
 def pack(data: str, tree: Tree) -> bytes:
     res = ''
-    for _, el in enumerate(data):
-        res += find_code(el, tree)
+    for i, el in enumerate(data):
+        code = find_code(el, tree)
+        res += code
+        print('On iter: ' + str(i) + ' Element ' + el + ' has code: ' + code + '\n')
     return code_to_bytes(res)
 
 
@@ -31,7 +33,15 @@ def bytes_to_code(data: bytes) -> str:
 
 
 def parse_code(code: str, tree: Tree) -> str:
-    return ''
+    tmp_tree = tree
+    res = ''
+    for _, b in enumerate(code):
+        if len(tmp_tree.symbol) <= 1:
+            res += tmp_tree.symbol
+            tmp_tree = tree
+            continue
+        tmp_tree = tmp_tree.left if b == 0 else tmp_tree.right
+    return res
 
 
 def code_to_bytes(code: str) -> bytes:
@@ -86,8 +96,12 @@ if __name__ == '__main__':
         data.append((symbol, prob))
 
     tree = list_to_tree(data)
-    original = open('.original.txt', 'r').read()
+    original = open('./original.txt', 'r').read()
     packed = pack(original, tree)
-    packed_file = open('./unpacked.txt', 'w').write(packed)
+    packed_file = open('./packed.txt', 'w').write(packed)
     unpacked = unpack(packed, tree)
-    unpacked_file = open('./packed.txt', 'w').write(unpacked)
+    unpacked_file = open('./unpacked.txt', 'w').write(unpacked)
+    if original == unpacked:
+        print('All is ok')
+    else:
+        print('All is not ok')
